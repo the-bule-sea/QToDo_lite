@@ -37,7 +37,7 @@ void TaskListWidget::mousePressEvent(QMouseEvent *event) {
     QListWidget::mousePressEvent(event);
 }
 
-Whiteboard::Whiteboard(QWidget *parent) : QWidget(parent) {
+Whiteboard::Whiteboard(QWidget *parent) : QWidget(parent) , isHandlingReturn(false){
     setWindowTitle("桌面白板");
     resize(400, 300);
     setStyleSheet("background-color: white; border: 1px solid black;");
@@ -61,15 +61,25 @@ void Whiteboard::onItemEdited(QListWidgetItem *item) {
 }
 
 void Whiteboard::handleReturnPressed() {
+    if(isHandlingReturn) return;
+    isHandlingReturn = true;
     CustomTextEdit* editor = qobject_cast<CustomTextEdit*>(sender());
     if (editor) {
         QListWidgetItem* item = taskList->currentItem();
         if (item && taskList->itemWidget(item) == editor) {
-            addNewTask();
-            editor->setText(editor->toPlainText().trimmed());  // 去除尾部空格
-            editor->clearFocus();  // 移除焦点，防止光标留在旧的编辑器内
+            QString text = editor->toPlainText().trimmed();
+            if (text.isEmpty()){
+                editor->setFocus();
+            }
+            else{
+                addNewTask();
+                editor->setText(editor->toPlainText().trimmed());  // 去除尾部空格
+                editor->clearFocus();  // 移除焦点，防止光标留在旧的编辑器内
+            }
         }
     }
+
+    isHandlingReturn = false;
 }
 
 void Whiteboard::addNewTask() {
@@ -84,6 +94,7 @@ void Whiteboard::addNewTask() {
     QTimer::singleShot(0, [this, newItem]() {
         taskList->setCurrentItem(newItem);
         taskList->editItem(newItem);
+        //        isHandlingReturn = false;
     });
 }
 
@@ -111,6 +122,7 @@ void Whiteboard::focusOnLastTask() {
 
         QTimer::singleShot(0, [this, lastItem]() {
             taskList->editItem(lastItem);
+            isHandlingReturn = false;
         });
     }
 }

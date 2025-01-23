@@ -72,6 +72,8 @@ private:
     void focusOnLastTask();
 
     TaskListWidget *taskList;
+
+    bool isHandlingReturn; // 判断是否需要新建，若为最后一个且没内容，就不再新建
 };
 
 #endif // MAINWINDOW_H
