@@ -53,11 +53,18 @@ Whiteboard::Whiteboard(QWidget *parent) : QWidget(parent) , isHandlingReturn(fal
 
     int whiteboard_width = rect2.size().width()*0.25;
     int whiteboard_height = rect2.size().height()*0.35;
+    this->setMinimumHeight(whiteboard_height);
+    this->setMinimumWidth(whiteboard_width);
     resize(whiteboard_width, whiteboard_height);
     setStyleSheet("background-color: white; border: 1px solid black;");
 
     QVBoxLayout *layout = new QVBoxLayout(this);
+//    layout->setSpacing(60); // 设置项目间的间距为60像素
+//    layout->setContentsMargins(5,5,5,5);
     taskList = new TaskListWidget();
+
+    // 设置边距
+    taskList->setSpacing(5);
 
     // 隐藏框线
     taskList->setFrameShape(QListWidget::NoFrame);
@@ -65,6 +72,7 @@ Whiteboard::Whiteboard(QWidget *parent) : QWidget(parent) , isHandlingReturn(fal
     // 隐藏滚动条
     taskList->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     taskList->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+
 
     layout->addWidget(taskList);
     setLayout(layout);
@@ -107,11 +115,8 @@ void Whiteboard::handleReturnPressed() {
 
 void Whiteboard::addNewTask() {
     QListWidgetItem *newItem = new QListWidgetItem("");
-    newItem->setSizeHint(QSize(taskList->width(), 50));
-//    QFont font(void ,18);
-//    newItem->setFont(font);
+    newItem->setSizeHint(QSize(0, 140));
     newItem->setFlags(newItem->flags() | Qt::ItemIsEditable);
-//    taskList->setFixedHeight(100);
     taskList->setWordWrap(true);
     taskList->addItem(newItem);
     CustomTextEdit* editor = createMultiLineEditor(newItem);
@@ -126,6 +131,9 @@ void Whiteboard::addNewTask() {
 
 CustomTextEdit* Whiteboard::createMultiLineEditor(QListWidgetItem *item) {
     CustomTextEdit *editor = new CustomTextEdit();
+    QFont textfont;
+    textfont.setPixelSize(35);
+    editor->setFont(textfont);
     editor->setPlaceholderText(".......");
     editor->setFrameShape(QFrame::NoFrame);
     editor->setWordWrapMode(QTextOption::WordWrap);
@@ -134,12 +142,15 @@ CustomTextEdit* Whiteboard::createMultiLineEditor(QListWidgetItem *item) {
     // 隐藏滚动条
     editor->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     editor->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    editor->setWordWrapMode(QTextOption::WrapAtWordBoundaryOrAnywhere);
+
 
     // 隐藏边框
     editor->setStyleSheet("border:none;");
 
     connect(editor, &CustomTextEdit::textChanged, [this, editor, item]() {
         item->setSizeHint(editor->document()->size().toSize());
+
     });
 
     connect(editor, &CustomTextEdit::returnPressed, this, &Whiteboard::handleReturnPressed);
