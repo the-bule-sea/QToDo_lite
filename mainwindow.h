@@ -9,6 +9,8 @@
 #include <QKeyEvent>
 #include <QTimer>
 #include <QTextEdit>
+#include <QScreen>
+#include <QDebug>
 #include "ui_mainwindow.h"
 
 QT_BEGIN_NAMESPACE

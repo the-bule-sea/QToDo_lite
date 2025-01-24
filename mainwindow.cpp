@@ -39,11 +39,33 @@ void TaskListWidget::mousePressEvent(QMouseEvent *event) {
 
 Whiteboard::Whiteboard(QWidget *parent) : QWidget(parent) , isHandlingReturn(false){
     setWindowTitle("桌面白板");
-    resize(400, 300);
+    QScreen* screen = QGuiApplication::primaryScreen();
+    // 获取当前实际屏幕大小
+    QRect rect1 = screen->geometry();
+    qDebug() << "rect1" << rect1.size().width() << rect1.size().height();
+    qDebug() << rect1.topLeft();
+    qDebug() << rect1.bottomRight();
+    //获取当前实际可用屏幕大小（去掉下边框）
+    QRect rect2 = screen->availableGeometry();
+    qDebug() << "rect2" << rect2.size().width() << rect2.size().height();
+    qDebug() << rect2.topLeft();
+    qDebug() << rect2.bottomRight();
+
+    int whiteboard_width = rect2.size().width()*0.25;
+    int whiteboard_height = rect2.size().height()*0.35;
+    resize(whiteboard_width, whiteboard_height);
     setStyleSheet("background-color: white; border: 1px solid black;");
 
     QVBoxLayout *layout = new QVBoxLayout(this);
     taskList = new TaskListWidget();
+
+    // 隐藏框线
+    taskList->setFrameShape(QListWidget::NoFrame);
+
+    // 隐藏滚动条
+    taskList->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    taskList->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+
     layout->addWidget(taskList);
     setLayout(layout);
 
@@ -64,6 +86,7 @@ void Whiteboard::handleReturnPressed() {
     if(isHandlingReturn) return;
     isHandlingReturn = true;
     CustomTextEdit* editor = qobject_cast<CustomTextEdit*>(sender());
+//    editor->setMinimumHeight(100);
     if (editor) {
         QListWidgetItem* item = taskList->currentItem();
         if (item && taskList->itemWidget(item) == editor) {
@@ -84,8 +107,11 @@ void Whiteboard::handleReturnPressed() {
 
 void Whiteboard::addNewTask() {
     QListWidgetItem *newItem = new QListWidgetItem("");
+    newItem->setSizeHint(QSize(taskList->width(), 50));
+//    QFont font(void ,18);
+//    newItem->setFont(font);
     newItem->setFlags(newItem->flags() | Qt::ItemIsEditable);
-
+//    taskList->setFixedHeight(100);
     taskList->setWordWrap(true);
     taskList->addItem(newItem);
     CustomTextEdit* editor = createMultiLineEditor(newItem);
@@ -100,10 +126,17 @@ void Whiteboard::addNewTask() {
 
 CustomTextEdit* Whiteboard::createMultiLineEditor(QListWidgetItem *item) {
     CustomTextEdit *editor = new CustomTextEdit();
-    editor->setPlaceholderText("输入任务...");
+    editor->setPlaceholderText(".......");
     editor->setFrameShape(QFrame::NoFrame);
     editor->setWordWrapMode(QTextOption::WordWrap);
     editor->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+
+    // 隐藏滚动条
+    editor->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    editor->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+
+    // 隐藏边框
+    editor->setStyleSheet("border:none;");
 
     connect(editor, &CustomTextEdit::textChanged, [this, editor, item]() {
         item->setSizeHint(editor->document()->size().toSize());
