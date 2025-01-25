@@ -12,6 +12,7 @@
 #include <QScreen>
 #include <QDebug>
 #include <QLabel>
+#include <exception>
 #include "ui_mainwindow.h"
 
 QT_BEGIN_NAMESPACE
@@ -54,7 +55,6 @@ public:
 
 protected:
     void mousePressEvent(QMouseEvent *event) override;
-
 signals:
     void clickedBlankSpace();
 };

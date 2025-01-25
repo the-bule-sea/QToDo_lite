@@ -127,7 +127,7 @@ void Whiteboard::mousePressEvent(QMouseEvent *event) {
 
 void Whiteboard::addNewTask() {
     QListWidgetItem *newItem = new QListWidgetItem("");
-    newItem->setSizeHint(QSize(0, 70));
+    newItem->setSizeHint(QSize(0, 62));
     newItem->setFlags(newItem->flags() | Qt::ItemIsEditable);
     taskList->setWordWrap(true);
     taskList->addItem(newItem);
@@ -176,7 +176,7 @@ CustomTextEdit* Whiteboard::createMultiLineEditor(QListWidgetItem *item) {
     QFont textfont;
     textfont.setPixelSize(30);
     editor->setFont(textfont);
-    editor->setPlaceholderText(".......");
+//    editor->setPlaceholderText(".......");
     editor->setFrameShape(QFrame::NoFrame);
     editor->setWordWrapMode(QTextOption::WordWrap);
     editor->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
@@ -190,10 +190,12 @@ CustomTextEdit* Whiteboard::createMultiLineEditor(QListWidgetItem *item) {
     // 隐藏边框
     editor->setStyleSheet("border:none;");
 
-    connect(editor, &CustomTextEdit::textChanged, [this, editor, item]() {
-        item->setSizeHint(editor->document()->size().toSize());
+    // test background
+//    editor->setStyleSheet("background-color: lightblue;");
 
-    });
+//    connect(editor, &CustomTextEdit::textChanged, [this, editor, item]() {
+//        item->setSizeHint(editor->document()->size().toSize());
+//    });
 
     connect(editor, &CustomTextEdit::returnPressed, this, &Whiteboard::handleReturnPressed);
 
