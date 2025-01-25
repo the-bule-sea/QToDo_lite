@@ -95,7 +95,6 @@ void Whiteboard::handleReturnPressed() {
     if(isHandlingReturn) return;
     isHandlingReturn = true;
     CustomTextEdit* editor = qobject_cast<CustomTextEdit*>(sender());
-    disconnect(editor, &CustomTextEdit::returnPressed, this, &Whiteboard::handleReturnPressed);
     if (editor) {
         QListWidgetItem* item = taskList->currentItem();
         qDebug() << "item" << taskList->currentItem() << "editor" << editor;
@@ -148,9 +147,6 @@ void Whiteboard::addNewTask() {
 
     // 文本输入框
     CustomTextEdit* editor = createMultiLineEditor(newItem);
-
-    // 监听输入框回车事件，确保可以添加新任务
-    connect(editor, &CustomTextEdit::returnPressed, this, &Whiteboard::handleReturnPressed);
 
     // 监听输入变化调整大小
     connect(editor, &CustomTextEdit::textChanged, [editor, newItem]() {
