@@ -64,7 +64,7 @@ Whiteboard::Whiteboard(QWidget *parent) : QWidget(parent) , isHandlingReturn(fal
     taskList = new TaskListWidget();
 
     // 设置边距
-    taskList->setSpacing(5);
+    taskList->setSpacing(2);
 
     // 隐藏框线
     taskList->setFrameShape(QListWidget::NoFrame);
@@ -91,18 +91,22 @@ void Whiteboard::onItemEdited(QListWidgetItem *item) {
 }
 
 void Whiteboard::handleReturnPressed() {
+    qDebug() << "handleReturnPressed called by" << sender();
     if(isHandlingReturn) return;
     isHandlingReturn = true;
     CustomTextEdit* editor = qobject_cast<CustomTextEdit*>(sender());
-//    editor->setMinimumHeight(100);
+    disconnect(editor, &CustomTextEdit::returnPressed, this, &Whiteboard::handleReturnPressed);
     if (editor) {
         QListWidgetItem* item = taskList->currentItem();
-        if (item && taskList->itemWidget(item) == editor) {
+        qDebug() << "item" << taskList->currentItem() << "editor" << editor;
+        if (item && ((taskList->itemWidget(item))->findChild<CustomTextEdit*>()) == editor) {
+            qDebug() << "if (item && taskList->itemWidget(item) == editor)";
             QString text = editor->toPlainText().trimmed();
             if (text.isEmpty()){
                 editor->setFocus();
             }
             else{
+                qDebug() << "addNewTask()";
                 addNewTask();
                 editor->setText(editor->toPlainText().trimmed());  // 去除尾部空格
                 editor->clearFocus();  // 移除焦点，防止光标留在旧的编辑器内
@@ -113,26 +117,68 @@ void Whiteboard::handleReturnPressed() {
     isHandlingReturn = false;
 }
 
+void Whiteboard::mousePressEvent(QMouseEvent *event) {
+    // 如果点击在taskList之外的区域，触发焦点
+    if (!taskList->geometry().contains(event->pos())) {
+        focusOnLastTask();
+    }
+    QWidget::mousePressEvent(event);
+}
+
+
 void Whiteboard::addNewTask() {
     QListWidgetItem *newItem = new QListWidgetItem("");
-    newItem->setSizeHint(QSize(0, 140));
+    newItem->setSizeHint(QSize(0, 70));
     newItem->setFlags(newItem->flags() | Qt::ItemIsEditable);
     taskList->setWordWrap(true);
     taskList->addItem(newItem);
+
+    QWidget *taskWidget = new QWidget();
+    QHBoxLayout *taskLayout = new QHBoxLayout(taskWidget);
+
+    // 创建大圆点
+    QLabel *bulletLabel = new QLabel("●");
+    QFont bulletFont;
+    bulletFont.setPixelSize(19);  // 设置大圆点的大小
+    bulletLabel->setFont(bulletFont);
+    bulletLabel->setStyleSheet("margin-top: -10px;");
+    bulletLabel->setAlignment(Qt::AlignTop);  // 顶部对齐，避免多行时不居中
+    bulletLabel->setFrameShape(QFrame::NoFrame);
+    bulletLabel->setStyleSheet("border:none;"); // 无边框
+
+    // 文本输入框
     CustomTextEdit* editor = createMultiLineEditor(newItem);
-    taskList->setItemWidget(newItem, editor);
+
+    // 监听输入框回车事件，确保可以添加新任务
+    connect(editor, &CustomTextEdit::returnPressed, this, &Whiteboard::handleReturnPressed);
+
+    // 监听输入变化调整大小
+    connect(editor, &CustomTextEdit::textChanged, [editor, newItem]() {
+       QSize documentSize = editor->document()->size().toSize();
+       editor->setFixedHeight(documentSize.height());  // 确保输入时高度自适应
+       newItem->setSizeHint(QSize(editor->width(), documentSize.height() + 20));
+    });
+
+
+    // 将圆点和输入框添加到布局
+    taskLayout->addWidget(bulletLabel);
+    taskLayout->addWidget(editor,1);
+
+    taskList->setItemWidget(newItem, taskWidget);
+
+    taskList->setCurrentItem(newItem);
+    editor->setFocus();
 
     QTimer::singleShot(0, [this, newItem]() {
         taskList->setCurrentItem(newItem);
         taskList->editItem(newItem);
-        //        isHandlingReturn = false;
     });
 }
 
 CustomTextEdit* Whiteboard::createMultiLineEditor(QListWidgetItem *item) {
     CustomTextEdit *editor = new CustomTextEdit();
     QFont textfont;
-    textfont.setPixelSize(35);
+    textfont.setPixelSize(30);
     editor->setFont(textfont);
     editor->setPlaceholderText(".......");
     editor->setFrameShape(QFrame::NoFrame);
@@ -160,13 +206,24 @@ CustomTextEdit* Whiteboard::createMultiLineEditor(QListWidgetItem *item) {
 
 void Whiteboard::focusOnLastTask() {
     if (taskList->count() > 0) {
-        QListWidgetItem *lastItem = taskList->item(taskList->count() - 1);
-        taskList->setCurrentItem(lastItem);
-        taskList->scrollToItem(lastItem);
+        qDebug() << "Whiteboard::focusOnLastTask";
+        QListWidgetItem* itemL = taskList->item(taskList->count() - 1);
 
-        QTimer::singleShot(0, [this, lastItem]() {
-            taskList->editItem(lastItem);
+        // 通过 itemL 查找其关联的 QWidget 并获取 CustomTextEdit
+        QWidget* taskWidget = taskList->itemWidget(itemL);
+        CustomTextEdit* editor = taskWidget->findChild<CustomTextEdit*>();
+
+        if (editor) {
+            editor->setFocus();  // 让输入框获取焦点
+        }
+
+        taskList->setCurrentItem(itemL);
+        taskList->scrollToItem(itemL);
+
+        QTimer::singleShot(0, [this, itemL]() {
+            taskList->editItem(itemL);
             isHandlingReturn = false;
         });
     }
 }
+

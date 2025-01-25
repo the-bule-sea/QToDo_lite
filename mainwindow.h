@@ -11,6 +11,7 @@
 #include <QTextEdit>
 #include <QScreen>
 #include <QDebug>
+#include <QLabel>
 #include "ui_mainwindow.h"
 
 QT_BEGIN_NAMESPACE
@@ -72,6 +73,7 @@ private:
     void addNewTask();
     CustomTextEdit* createMultiLineEditor(QListWidgetItem *item);
     void focusOnLastTask();
+    void mousePressEvent(QMouseEvent *event);
 
     TaskListWidget *taskList;
 
