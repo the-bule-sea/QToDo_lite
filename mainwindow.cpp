@@ -55,6 +55,8 @@ Whiteboard::Whiteboard(QWidget *parent) : QWidget(parent) , isHandlingReturn(fal
     int whiteboard_height = rect2.size().height()*0.35;
     this->setMinimumHeight(whiteboard_height);
     this->setMinimumWidth(whiteboard_width);
+//    this->setWindowFlags(Qt::CustomizeWindowHint |Qt::WindowTitleHint);
+    this->setWindowFlags(Qt::CustomizeWindowHint |Qt::WindowTitleHint |Qt::WindowCloseButtonHint);
     resize(whiteboard_width, whiteboard_height);
     setStyleSheet("background-color: white; border: 1px solid black;");
 
@@ -136,14 +138,23 @@ void Whiteboard::addNewTask() {
     QHBoxLayout *taskLayout = new QHBoxLayout(taskWidget);
 
     // 创建大圆点
-    QLabel *bulletLabel = new QLabel("●");
-    QFont bulletFont;
-    bulletFont.setPixelSize(19);  // 设置大圆点的大小
-    bulletLabel->setFont(bulletFont);
-    bulletLabel->setStyleSheet("margin-top: -10px;");
-    bulletLabel->setAlignment(Qt::AlignTop);  // 顶部对齐，避免多行时不居中
-    bulletLabel->setFrameShape(QFrame::NoFrame);
-    bulletLabel->setStyleSheet("border:none;"); // 无边框
+    QToolButton *bulletLabel = new QToolButton;
+//    bulletLabel->setText("*");
+//    QFont bulletFont;
+//    bulletFont.setPixelSize(19);  // 设置大圆点的大小
+//    bulletLabel->setFont(bulletFont);
+//    bulletLabel->setStyleSheet("margin-top: -10px;");
+//    bulletLabel->setAlignment(Qt::AlignTop);  // 顶部对齐，避免多行时不居中
+//    bulletLabel->setFrameShape(QFrame::NoFrame);
+//    bulletLabel->setStyleSheet("border:none;"); // 无边框
+    bulletLabel->setStyleSheet("QToolButton{background-color:#c2c2c2;border-radius:9px}\nQToolButton:hover {background-color:#cb4042;border-radius:9px;}\nQToolButton:pressed {background-color:#ab3b3a;border-radius:9px;}");
+
+    bulletLabel->setFixedSize(24, 24);
+
+    // 将按钮放入一个布局管理器中，并设置对齐方式
+    QVBoxLayout *buttonLayout = new QVBoxLayout();
+    buttonLayout->addWidget(bulletLabel);
+    buttonLayout->setAlignment(bulletLabel, Qt::AlignTop);
 
     // 文本输入框
     CustomTextEdit* editor = createMultiLineEditor(newItem);
@@ -155,12 +166,37 @@ void Whiteboard::addNewTask() {
        newItem->setSizeHint(QSize(editor->width(), documentSize.height() + 20));
     });
 
-
     // 将圆点和输入框添加到布局
-    taskLayout->addWidget(bulletLabel);
+    taskLayout->addLayout(buttonLayout);
+//    taskLayout->addWidget(bulletLabel);
     taskLayout->addWidget(editor,1);
 
     taskList->setItemWidget(newItem, taskWidget);
+
+    connect(bulletLabel, &QToolButton::clicked, this, [this, newItem]()
+    {
+        int row = taskList->row(newItem);
+        if (row > 0 || (row == 0&& taskList->count() > 1)) {
+            // 从列表中取出该项（同时移除与之关联的部件）
+            QListWidgetItem *removedItem = taskList->takeItem(row);
+            // debug row
+            qDebug() << "row: " << row ;
+            // 删除该项，释放内存（注意：itemWidget() 关联的 QWidget 会一并被删除）
+            delete removedItem;
+        }
+        else if(row == 0){
+            QListWidgetItem *item = taskList->item(row); // 使用 item() 而不是 takeItem()
+                    if (item) {
+                        QWidget *widget = taskList->itemWidget(item);
+                        if (widget) {
+                            CustomTextEdit *editor = widget->findChild<CustomTextEdit*>();
+                            if (editor) {
+                                editor->setText(""); // 清空文本内容
+                            }
+                        }
+                    }
+        }
+    });
 
     taskList->setCurrentItem(newItem);
     editor->setFocus();

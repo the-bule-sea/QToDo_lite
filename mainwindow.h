@@ -12,6 +12,7 @@
 #include <QScreen>
 #include <QDebug>
 #include <QLabel>
+#include <QToolButton>
 #include <exception>
 #include "ui_mainwindow.h"
 
