@@ -71,10 +71,11 @@ private slots:
     void handleReturnPressed();
 
 private:
-    void addNewTask();
+    void addNewTask(const QString& text = "");
     CustomTextEdit* createMultiLineEditor(QListWidgetItem *item);
     void focusOnLastTask();
     void mousePressEvent(QMouseEvent *event);
+    void closeEvent(QCloseEvent *event);
 
     TaskListWidget *taskList;
 

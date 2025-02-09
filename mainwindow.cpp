@@ -1,4 +1,6 @@
 #include "mainwindow.h"
+#include "data_manager.h"
+
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MainWindow)
@@ -80,7 +82,12 @@ Whiteboard::Whiteboard(QWidget *parent) : QWidget(parent) , isHandlingReturn(fal
     setLayout(layout);
 
     // 初始添加一个可编辑任务项
-    addNewTask();
+//    addNewTask();
+    // 加载数据
+    QList<TaskData> tasks = DataManager::loadData("data.json");
+    for (const auto& task : tasks){
+        addNewTask(task.text);
+    }
 
     connect(taskList, &TaskListWidget::clickedBlankSpace, this, &Whiteboard::focusOnLastTask);
     connect(taskList, &QListWidget::itemChanged, this, &Whiteboard::onItemEdited);
@@ -126,8 +133,24 @@ void Whiteboard::mousePressEvent(QMouseEvent *event) {
     QWidget::mousePressEvent(event);
 }
 
+void Whiteboard::closeEvent(QCloseEvent *event){
+    QList<TaskData> tasks;
+    for(int i = 0; i < taskList->count(); ++i){
+        QListWidgetItem* item = taskList->item(i);
+        QWidget *widget = taskList->itemWidget(item);
+        if (widget) {
+            CustomTextEdit *editor = widget->findChild<CustomTextEdit*>();
+            if (editor) {
+                tasks.append({editor->toPlainText()});
+            }
+        }
+    }
+    DataManager::saveData(tasks, "data.json");
+    QWidget::closeEvent(event);
+}
 
-void Whiteboard::addNewTask() {
+
+void Whiteboard::addNewTask(const QString& text) {
     QListWidgetItem *newItem = new QListWidgetItem("");
     newItem->setSizeHint(QSize(0, 62));
     newItem->setFlags(newItem->flags() | Qt::ItemIsEditable);
@@ -158,12 +181,37 @@ void Whiteboard::addNewTask() {
 
     // 文本输入框
     CustomTextEdit* editor = createMultiLineEditor(newItem);
+    if(!text.isEmpty()){
+        editor->setText(text);
+        qDebug() << "text: " << text;
+        editor->clearFocus();
+
+        // 处理所有的挂起事件
+        QApplication::processEvents();
+
+        // 动态调整
+        QSize documentSize = editor->document()->size().toSize();
+        int contentHeight = documentSize.height();
+
+        if (contentHeight == 0){
+            contentHeight = editor->fontMetrics().height();
+        }
+
+        int paddingHeight = editor->contentsMargins().top() + editor->contentsMargins().bottom();
+        int actualHeight = contentHeight + paddingHeight; //  这里不需要再加行高，因为documentSize已经包含了
+        editor->setFixedHeight(actualHeight+15);
+        newItem->setSizeHint(QSize(editor->width(), actualHeight + 40)); // 根据内容调整item高度
+        qDebug() << "初始化动态调整actualHeight" << actualHeight;
+    }
 
     // 监听输入变化调整大小
     connect(editor, &CustomTextEdit::textChanged, [editor, newItem]() {
+       qDebug() << "加载数据输入框变化" ;
        QSize documentSize = editor->document()->size().toSize();
        editor->setFixedHeight(documentSize.height());  // 确保输入时高度自适应
        newItem->setSizeHint(QSize(editor->width(), documentSize.height() + 20));
+       qDebug() << "监听大小" << "editor" << documentSize.height();
+       qDebug() << "监听大小" << "editor->width()" << editor->width();
     });
 
     // 将圆点和输入框添加到布局
@@ -253,7 +301,6 @@ void Whiteboard::focusOnLastTask() {
 
         taskList->setCurrentItem(itemL);
         taskList->scrollToItem(itemL);
-
         QTimer::singleShot(0, [this, itemL]() {
             taskList->editItem(itemL);
             isHandlingReturn = false;

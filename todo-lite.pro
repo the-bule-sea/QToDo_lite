@@ -14,6 +14,7 @@ SOURCES += \
     mainwindow.cpp
 
 HEADERS += \
+    data_manager.h \
     mainwindow.h \
 #    qLineEdit.h
 
