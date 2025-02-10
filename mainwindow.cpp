@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include "data_manager.h"
+#include "config_manager.h"
 
 
 MainWindow::MainWindow(QWidget *parent)
@@ -62,6 +63,7 @@ Whiteboard::Whiteboard(QWidget *parent) : QWidget(parent) , isHandlingReturn(fal
     resize(whiteboard_width, whiteboard_height);
     setStyleSheet("background-color: white; border: 1px solid black;");
 
+
     QVBoxLayout *layout = new QVBoxLayout(this);
 //    layout->setSpacing(60); // 设置项目间的间距为60像素
 //    layout->setContentsMargins(5,5,5,5);
@@ -81,16 +83,27 @@ Whiteboard::Whiteboard(QWidget *parent) : QWidget(parent) , isHandlingReturn(fal
     layout->addWidget(taskList);
     setLayout(layout);
 
-    // 初始添加一个可编辑任务项
-//    addNewTask();
     // 加载数据
     QList<TaskData> tasks = DataManager::loadData("data.json");
     for (const auto& task : tasks){
+        if(!task.text.trimmed().isEmpty())
         addNewTask(task.text);
     }
+    // 初始添加一个可编辑任务项
+    addNewTask();
+
+    // 加载配置文件
+    loadWhiteboardConfig();
 
     connect(taskList, &TaskListWidget::clickedBlankSpace, this, &Whiteboard::focusOnLastTask);
     connect(taskList, &QListWidget::itemChanged, this, &Whiteboard::onItemEdited);
+}
+
+void Whiteboard::loadWhiteboardConfig()
+{
+    WindowGeometry geometry = ConfigManager::loadWindowGeometry("whiteboard_config.ini");
+    qDebug() << "loadWhiteboardConfig()" << "白板位置" << geometry.topLeft;
+    setGeometry(geometry.topLeft.x(), geometry.topLeft.y(), geometry.size.width(), geometry.size.height());
 }
 
 void Whiteboard::onItemEdited(QListWidgetItem *item) {
@@ -146,7 +159,18 @@ void Whiteboard::closeEvent(QCloseEvent *event){
         }
     }
     DataManager::saveData(tasks, "data.json");
+
+    // 白板窗口配置(窗口大小与位置)
+    saveWhiteboardConfig();
     QWidget::closeEvent(event);
+}
+
+void Whiteboard::saveWhiteboardConfig(){
+    WindowGeometry geometry;
+    geometry.topLeft = pos();
+    geometry.size = size();
+    qDebug() << "白板位置" << geometry.topLeft << "白板大小" << geometry.size ;
+    ConfigManager::saveWindowGeometry(geometry, "whiteboard_config.ini");
 }
 
 

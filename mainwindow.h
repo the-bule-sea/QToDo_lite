@@ -76,6 +76,8 @@ private:
     void focusOnLastTask();
     void mousePressEvent(QMouseEvent *event);
     void closeEvent(QCloseEvent *event);
+    void saveWhiteboardConfig();
+    void loadWhiteboardConfig();
 
     TaskListWidget *taskList;
 
