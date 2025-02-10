@@ -103,7 +103,13 @@ void Whiteboard::loadWhiteboardConfig()
 {
     WindowGeometry geometry = ConfigManager::loadWindowGeometry("whiteboard_config.ini");
     qDebug() << "loadWhiteboardConfig()" << "白板位置" << geometry.topLeft;
-    setGeometry(geometry.topLeft.x(), geometry.topLeft.y(), geometry.size.width(), geometry.size.height());
+    // 获取标题栏高度
+    int titleBarHeight = style()->pixelMetric(QStyle::PM_TitleBarHeight);
+
+    // 调整 y 坐标，减去标题栏高度
+    int adjustedY = geometry.topLeft.y() + titleBarHeight;
+    qDebug() << "标题栏高度" << titleBarHeight;
+    setGeometry(geometry.topLeft.x(), adjustedY, geometry.size.width(), geometry.size.height());
 }
 
 void Whiteboard::onItemEdited(QListWidgetItem *item) {
