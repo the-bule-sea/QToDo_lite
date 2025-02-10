@@ -14,6 +14,9 @@
 #include <QLabel>
 #include <QToolButton>
 #include <exception>
+#include <QSystemTrayIcon>
+#include <QMenu>
+#include <QAction>
 #include "ui_mainwindow.h"
 
 QT_BEGIN_NAMESPACE

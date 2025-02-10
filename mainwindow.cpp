@@ -59,7 +59,23 @@ Whiteboard::Whiteboard(QWidget *parent) : QWidget(parent) , isHandlingReturn(fal
     this->setMinimumHeight(whiteboard_height);
     this->setMinimumWidth(whiteboard_width);
 //    this->setWindowFlags(Qt::CustomizeWindowHint |Qt::WindowTitleHint);
-    this->setWindowFlags(Qt::CustomizeWindowHint |Qt::WindowTitleHint |Qt::WindowCloseButtonHint);
+    this->setWindowFlags(Qt::Tool |Qt::CustomizeWindowHint |Qt::WindowTitleHint);
+
+    // 图标设置
+    QSystemTrayIcon *trayIcon = new QSystemTrayIcon(this);
+    trayIcon->setIcon(QIcon("://todo_ico_v2.svg"));
+    trayIcon->setToolTip("todo-lite");
+
+    // 创建托盘右键菜单
+    QMenu *trayMenu = new QMenu(this);
+    QAction *showAction = new QAction("测试1", this);
+    QAction *quitAction = new QAction("测试2", this);
+    trayMenu->addAction(showAction);
+    trayMenu->addSeparator();
+    trayMenu->addAction(quitAction);
+    trayIcon->setContextMenu(trayMenu);
+    trayIcon->show();
+
     resize(whiteboard_width, whiteboard_height);
     setStyleSheet("background-color: white; border: 1px solid black;");
 
@@ -196,28 +212,27 @@ void Whiteboard::addNewTask(const QString& text) {
 //    QFont bulletFont;
 //    bulletFont.setPixelSize(19);  // 设置大圆点的大小
 //    bulletLabel->setFont(bulletFont);
-//    bulletLabel->setStyleSheet("margin-top: -10px;");
+//    bulletLabel->setStyleSheet("margin-top: +30px;");
 //    bulletLabel->setAlignment(Qt::AlignTop);  // 顶部对齐，避免多行时不居中
 //    bulletLabel->setFrameShape(QFrame::NoFrame);
 //    bulletLabel->setStyleSheet("border:none;"); // 无边框
     bulletLabel->setStyleSheet("QToolButton{background-color:#c2c2c2;border-radius:9px}\nQToolButton:hover {background-color:#cb4042;border-radius:9px;}\nQToolButton:pressed {background-color:#ab3b3a;border-radius:9px;}");
 
-    bulletLabel->setFixedSize(24, 24);
+    bulletLabel->setFixedSize(22, 22);
 
     // 将按钮放入一个布局管理器中，并设置对齐方式
     QVBoxLayout *buttonLayout = new QVBoxLayout();
     buttonLayout->addWidget(bulletLabel);
     buttonLayout->setAlignment(bulletLabel, Qt::AlignTop);
+    buttonLayout->setContentsMargins(0,6,0,0);
 
     // 文本输入框
     CustomTextEdit* editor = createMultiLineEditor(newItem);
     if(!text.isEmpty()){
         editor->setText(text);
+        editor->adjustSize();
         qDebug() << "text: " << text;
         editor->clearFocus();
-
-        // 处理所有的挂起事件
-        QApplication::processEvents();
 
         // 动态调整
         QSize documentSize = editor->document()->size().toSize();
@@ -239,7 +254,7 @@ void Whiteboard::addNewTask(const QString& text) {
        qDebug() << "加载数据输入框变化" ;
        QSize documentSize = editor->document()->size().toSize();
        editor->setFixedHeight(documentSize.height());  // 确保输入时高度自适应
-       newItem->setSizeHint(QSize(editor->width(), documentSize.height() + 20));
+       newItem->setSizeHint(QSize(editor->width(), documentSize.height() + 25));
        qDebug() << "监听大小" << "editor" << documentSize.height();
        qDebug() << "监听大小" << "editor->width()" << editor->width();
     });
