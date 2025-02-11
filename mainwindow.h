@@ -81,8 +81,16 @@ private:
     void closeEvent(QCloseEvent *event);
     void saveWhiteboardConfig();
     void loadWhiteboardConfig();
+    void createActions();
+    void createTrayIcon();
 
     TaskListWidget *taskList;
+
+    QAction *settingAction;
+    QAction *quitAction;
+
+    QSystemTrayIcon *trayIcon;
+    QMenu *trayIconMenu;
 
     bool isHandlingReturn; // 判断是否需要新建，若为最后一个且没内容，就不再新建
 };

@@ -61,20 +61,9 @@ Whiteboard::Whiteboard(QWidget *parent) : QWidget(parent) , isHandlingReturn(fal
 //    this->setWindowFlags(Qt::CustomizeWindowHint |Qt::WindowTitleHint);
     this->setWindowFlags(Qt::Tool |Qt::CustomizeWindowHint |Qt::WindowTitleHint);
 
-    // 图标设置
-    QSystemTrayIcon *trayIcon = new QSystemTrayIcon(this);
-    trayIcon->setIcon(QIcon("://todo_ico_v2.svg"));
-    trayIcon->setToolTip("todo-lite");
-
-    // 创建托盘右键菜单
-    QMenu *trayMenu = new QMenu(this);
-    QAction *showAction = new QAction("测试1", this);
-    QAction *quitAction = new QAction("测试2", this);
-    trayMenu->addAction(showAction);
-    trayMenu->addSeparator();
-    trayMenu->addAction(quitAction);
-    trayIcon->setContextMenu(trayMenu);
-    trayIcon->show();
+    // 创建托盘
+    createActions();
+    createTrayIcon();
 
     resize(whiteboard_width, whiteboard_height);
     setStyleSheet("background-color: white; border: 1px solid black;");
@@ -126,6 +115,47 @@ void Whiteboard::loadWhiteboardConfig()
     int adjustedY = geometry.topLeft.y() + titleBarHeight;
     qDebug() << "标题栏高度" << titleBarHeight;
     setGeometry(geometry.topLeft.x(), adjustedY, geometry.size.width(), geometry.size.height());
+}
+
+void Whiteboard::createActions()
+{
+    settingAction = new QAction(tr("&Setting"), this);
+    connect(settingAction, &QAction::triggered, this, &Whiteboard::showNormal);
+    quitAction = new QAction(tr("&Quit"), this);
+    connect(quitAction, &QAction::triggered, qApp, &QCoreApplication::quit);
+}
+
+void Whiteboard::createTrayIcon()
+{
+    QMenu* trayMenu = new QMenu(this);
+    trayMenu->addAction(settingAction);
+    trayMenu->addSeparator();
+    trayMenu->addAction(quitAction);
+    
+    trayIcon = new QSystemTrayIcon(this);
+    trayIcon->setContextMenu(trayMenu);
+    trayIcon->setIcon(QIcon("://todo_ico_v2.svg"));
+    trayIcon->setToolTip("todo-lite");
+    trayMenu->setStyleSheet("QMenu {"
+                             "    background-color: #ffffff; /* Light gray background */"
+                             "    border: 2px solid #c0c0c0;      /* Gray border */"
+                             "    padding: 4px;"
+                             "}"
+                             "QMenu::item {"
+                             "    background-color: #ffffff; /* 设置菜单项背景颜色 */"
+                             "    color: #333333; "
+                             "    padding: 5px 10px;          /* Padding around text */"
+                             "}"
+                             "QMenu::item:selected {"
+                             "    border: 0px solid transparent;"
+                             "    background-color: #3388FF; /* Slightly bule on hover */"
+                             "    color: #ffffff;"
+                             "}"
+                             "QMenu::item:selected {"
+                             "    border-radius: 10px; "
+                             "}"
+                            );
+    trayIcon->show();
 }
 
 void Whiteboard::onItemEdited(QListWidgetItem *item) {
