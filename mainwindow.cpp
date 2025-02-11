@@ -7,18 +7,22 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    // 假设 onCreateBoard 是用于初始化 Whiteboard 的槽函数
-    connect(ui->btnCreateBoard, &QPushButton::clicked, this, &MainWindow::onCreateBoard);
+    ui->stackedWidget->addWidget(&aboutWindow);
+    ui->stackedWidget->addWidget(&settingWindow);
+
+    btnGroup.addButton(ui->btnSettings, 0);
+    btnGroup.addButton(ui->btnAbout,1);
+
+    connect(&btnGroup, QOverload<int>::of(&QButtonGroup::buttonClicked), ui->stackedWidget, &QStackedWidget::setCurrentIndex);
+
+    // 默认选中界面
+    btnGroup.button(0)->setChecked(true);
+    ui->stackedWidget->setCurrentIndex(0);
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
-}
-
-void MainWindow::onCreateBoard() {
-    Whiteboard *whiteboard = new Whiteboard();
-    whiteboard->show();
 }
 
 void CustomTextEdit::keyPressEvent(QKeyEvent *event) {
@@ -120,7 +124,7 @@ void Whiteboard::loadWhiteboardConfig()
 void Whiteboard::createActions()
 {
     settingAction = new QAction(tr("&Setting"), this);
-    connect(settingAction, &QAction::triggered, this, &Whiteboard::showNormal);
+    connect(settingAction, &QAction::triggered, this, &Whiteboard::createNewMainWindow);
     quitAction = new QAction(tr("&Quit"), this);
     connect(quitAction, &QAction::triggered, qApp, &QCoreApplication::quit);
 }
@@ -156,6 +160,14 @@ void Whiteboard::createTrayIcon()
                              "}"
                             );
     trayIcon->show();
+}
+
+void Whiteboard::createNewMainWindow()
+{
+    MainWindow *mainWindow = new MainWindow();
+    mainWindow->setWindowTitle("ToDo-lite");
+    mainWindow->setAttribute(Qt::WA_QuitOnClose, false); // 设置窗口属性
+    mainWindow->show();
 }
 
 void Whiteboard::onItemEdited(QListWidgetItem *item) {

@@ -17,7 +17,10 @@
 #include <QSystemTrayIcon>
 #include <QMenu>
 #include <QAction>
+#include <QButtonGroup>
 #include "ui_mainwindow.h"
+#include "aboutwindow.h"
+#include "settingwindow.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -32,10 +35,14 @@ public:
     ~MainWindow();
 
 private slots:
-    void onCreateBoard();  // 新建白板槽函数
+
 
 private:
     Ui::MainWindow *ui;
+
+    QButtonGroup btnGroup;
+    AboutWindow aboutWindow;
+    SettingWindow settingWindow;
 };
 
 // 自定义 QTextEdit 类以处理回车键事件
@@ -83,6 +90,7 @@ private:
     void loadWhiteboardConfig();
     void createActions();
     void createTrayIcon();
+    void createNewMainWindow();
 
     TaskListWidget *taskList;
 

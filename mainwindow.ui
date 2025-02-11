@@ -7,24 +7,159 @@
     <x>0</x>
     <y>0</y>
     <width>800</width>
-    <height>600</height>
+    <height>400</height>
    </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>800</width>
+    <height>400</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>800</width>
+    <height>680</height>
+   </size>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QPushButton" name="btnCreateBoard">
+   <widget class="QWidget" name="sideBar" native="true">
     <property name="geometry">
      <rect>
-      <x>40</x>
-      <y>50</y>
+      <x>0</x>
+      <y>0</y>
       <width>231</width>
-      <height>121</height>
+      <height>691</height>
      </rect>
     </property>
-    <property name="text">
-     <string>新建桌面白板</string>
+    <property name="styleSheet">
+     <string notr="true">QWidget
+{
+	background-color: #ffffff;
+}</string>
+    </property>
+    <layout class="QGridLayout" name="gridLayout">
+     <item row="0" column="0">
+      <widget class="QToolButton" name="btnSettings">
+       <property name="minimumSize">
+        <size>
+         <width>180</width>
+         <height>60</height>
+        </size>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">/* 默认样式 */
+QToolButton {
+	font-family: &quot;Arial&quot;, &quot;Helvetica&quot;, sans-serif;
+    min-width: 180px;
+    min-height: 60px;
+    border: none; /* 移除默认边框 */
+    border-radius: 0px; /* 移除默认圆角 */
+	font-size:24px;
+}
+
+/* 鼠标悬停时 */
+QToolButton:hover {
+    background-color: rgba(205, 205, 205, 50%); /* 灰色遮罩，透明度 50% */
+    border-radius: 16px; /* 椭圆 */
+}
+
+/* 点击和按下时 */
+QToolButton:pressed, QToolButton:checked {
+    background-color: rgb(51, 136, 255); /* 蓝色背景 */
+	color: white;
+    border-radius: 16px; /* 椭圆 */
+}</string>
+       </property>
+       <property name="text">
+        <string>Settings</string>
+       </property>
+       <property name="checkable">
+        <bool>true</bool>
+       </property>
+       <property name="autoExclusive">
+        <bool>true</bool>
+       </property>
+       <property name="toolButtonStyle">
+        <enum>Qt::ToolButtonTextUnderIcon</enum>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QToolButton" name="btnAbout">
+       <property name="minimumSize">
+        <size>
+         <width>180</width>
+         <height>60</height>
+        </size>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">/* 默认样式 */
+QToolButton {
+	font-family: &quot;Arial&quot;, &quot;Helvetica&quot;, sans-serif;
+    min-width: 180px;
+    min-height: 60px;
+    border: none; /* 移除默认边框 */
+    border-radius: 0px; /* 移除默认圆角 */
+	font-size:24px;
+}
+
+/* 鼠标悬停时 */
+QToolButton:hover {
+    background-color: rgba(205, 205, 205, 50%); /* 灰色遮罩，透明度 50% */
+    border-radius: 16px; /* 椭圆 */
+}
+
+/* 点击和按下时 */
+QToolButton:pressed, QToolButton:checked {
+    background-color: rgb(51, 136, 255); /* 蓝色背景 */
+    border-radius: 16px; /* 椭圆 */
+	color: white;
+}</string>
+       </property>
+       <property name="text">
+        <string>About</string>
+       </property>
+       <property name="checkable">
+        <bool>true</bool>
+       </property>
+       <property name="autoExclusive">
+        <bool>true</bool>
+       </property>
+       <property name="toolButtonStyle">
+        <enum>Qt::ToolButtonTextUnderIcon</enum>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="0">
+      <spacer name="verticalSpacer">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+       <property name="sizeType">
+        <enum>QSizePolicy::Expanding</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>20</width>
+         <height>40</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QStackedWidget" name="stackedWidget">
+    <property name="geometry">
+     <rect>
+      <x>229</x>
+      <y>-1</y>
+      <width>571</width>
+      <height>381</height>
+     </rect>
     </property>
    </widget>
   </widget>
@@ -38,7 +173,6 @@
     </rect>
    </property>
   </widget>
-  <widget class="QStatusBar" name="statusbar"/>
  </widget>
  <resources/>
  <connections/>
