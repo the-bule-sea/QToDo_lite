@@ -1,6 +1,7 @@
 #include "settingwindow.h"
 #include "ui_settingwindow.h"
 #include <QCoreApplication>
+#include <QDebug>
 
 #ifdef Q_OS_WIN32
 #include <QSettings>
