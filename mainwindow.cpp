@@ -6,9 +6,11 @@
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MainWindow)
 {
+    this->setWindowIcon(QIcon("://todo_ico_v2.svg"));
+
     ui->setupUi(this);
-    ui->stackedWidget->addWidget(&aboutWindow);
     ui->stackedWidget->addWidget(&settingWindow);
+    ui->stackedWidget->addWidget(&aboutWindow);
 
     btnGroup.addButton(ui->btnSettings, 0);
     btnGroup.addButton(ui->btnAbout,1);

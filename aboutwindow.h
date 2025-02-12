@@ -14,6 +14,8 @@ class AboutWindow : public QWidget
 public:
     explicit AboutWindow(QWidget *parent = nullptr);
     ~AboutWindow();
+private slots:
+    void openSourceUrl();
 
 private:
     Ui::AboutWindow *ui;

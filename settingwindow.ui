@@ -13,18 +13,45 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <widget class="QLabel" name="label">
+  <widget class="QWidget" name="gridLayoutWidget">
    <property name="geometry">
     <rect>
-     <x>150</x>
-     <y>90</y>
-     <width>54</width>
-     <height>12</height>
+     <x>-1</x>
+     <y>-1</y>
+     <width>401</width>
+     <height>301</height>
     </rect>
    </property>
-   <property name="text">
-    <string>2233</string>
-   </property>
+   <layout class="QGridLayout" name="gridLayout">
+    <item row="0" column="1" alignment="Qt::AlignLeft">
+     <widget class="QCheckBox" name="autostartBox">
+      <property name="text">
+       <string>自启动</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="1" alignment="Qt::AlignLeft">
+     <widget class="QCheckBox" name="updateBox">
+      <property name="text">
+       <string>检查更新</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="0">
+     <widget class="QLabel" name="label">
+      <property name="text">
+       <string>常规设置</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="0">
+     <widget class="QLabel" name="label_2">
+      <property name="text">
+       <string>隐私设置</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
   </widget>
  </widget>
  <resources/>
