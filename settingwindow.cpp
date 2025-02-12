@@ -50,7 +50,17 @@ void SettingWindow::setAutoStart(bool enable)
         settings.remove(APP_NAME);
     }
 #else // Q_OS_LINUX
-    QString desktopFilePath = QDir::homePath() + "/.config/autostart/QToDoLite.desktop";
+    QString autostartDir = QDir::homePath() + "/.config/autostart";
+    QString desktopFilePath = autostartDir + "/" + APP_NAME + ".desktop";
+
+    QDir dir(autostartDir);
+    if (!dir.exists()) {
+            if (!dir.mkpath(autostartDir)) {  // Use mkpath to create parent directories if needed
+                qWarning() << "Failed to create autostart directory:" << autostartDir;
+                return; // Or handle the error as appropriate
+            }
+        }
+
     if (enable) {
         QFile file(desktopFilePath);
         if (file.open(QFile::WriteOnly | QFile::Text)) {
@@ -62,9 +72,13 @@ void SettingWindow::setAutoStart(bool enable)
             stream << "Hidden=false" << endl;
             stream << "Terminal=false" << endl;
             file.close();
+        } else {
+            qWarning() << "Failed to open desktop file for writing:" << desktopFilePath;
         }
     } else {
-        QFile::remove(desktopFilePath);
+        if(!QFile::remove(desktopFilePath)) {
+                    qWarning() << "Failed to remove desktop file:" << desktopFilePath;
+                }
     }
 #endif
 }
