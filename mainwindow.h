@@ -91,6 +91,7 @@ private:
     void createActions();
     void createTrayIcon();
     void createNewMainWindow();
+    void handleQuitAction();
 
     TaskListWidget *taskList;
 

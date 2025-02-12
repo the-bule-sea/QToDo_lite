@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "data_manager.h"
 #include "config_manager.h"
+#include <QDir>
 
 
 MainWindow::MainWindow(QWidget *parent)
@@ -94,8 +95,12 @@ Whiteboard::Whiteboard(QWidget *parent) : QWidget(parent) , isHandlingReturn(fal
     layout->addWidget(taskList);
     setLayout(layout);
 
+    // 获取应用程序数据目录
+    QString dataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+    QString filePath = dataPath + "/data.json";
+    qDebug() << "应用程序数据目录" << filePath;
     // 加载数据
-    QList<TaskData> tasks = DataManager::loadData("data.json");
+    QList<TaskData> tasks = DataManager::loadData(filePath);
     for (const auto& task : tasks){
         if(!task.text.trimmed().isEmpty())
         addNewTask(task.text);
@@ -112,7 +117,10 @@ Whiteboard::Whiteboard(QWidget *parent) : QWidget(parent) , isHandlingReturn(fal
 
 void Whiteboard::loadWhiteboardConfig()
 {
-    WindowGeometry geometry = ConfigManager::loadWindowGeometry("whiteboard_config.ini");
+    // 获取应用配置目录
+    QString configPath = QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation);
+    QString filePath = configPath + "/whiteboard_config.ini";
+    WindowGeometry geometry = ConfigManager::loadWindowGeometry(filePath);
     qDebug() << "loadWhiteboardConfig()" << "白板位置" << geometry.topLeft;
     // 获取标题栏高度
     int titleBarHeight = style()->pixelMetric(QStyle::PM_TitleBarHeight);
@@ -128,7 +136,7 @@ void Whiteboard::createActions()
     settingAction = new QAction(tr("&Setting"), this);
     connect(settingAction, &QAction::triggered, this, &Whiteboard::createNewMainWindow);
     quitAction = new QAction(tr("&Quit"), this);
-    connect(quitAction, &QAction::triggered, qApp, &QCoreApplication::quit);
+    connect(quitAction, &QAction::triggered, this, &Whiteboard::handleQuitAction);
 }
 
 void Whiteboard::createTrayIcon()
@@ -224,11 +232,30 @@ void Whiteboard::closeEvent(QCloseEvent *event){
             }
         }
     }
-    DataManager::saveData(tasks, "data.json");
+
+    // 获取应用程序数据目录
+    QString dataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+    QDir dir(dataPath);
+    if (!dir.exists()){
+        qDebug() << "创建应用程序数据目录" << dataPath;
+        dir.mkpath(".");
+    }
+    QString filePath = dataPath + "/data.json";
+    qDebug() << "closeEvent";
+    DataManager::saveData(tasks, filePath);
 
     // 白板窗口配置(窗口大小与位置)
     saveWhiteboardConfig();
     QWidget::closeEvent(event);
+}
+
+void Whiteboard::handleQuitAction()
+{
+    // 在退出事件循环之前执行 closeEvent
+    close(); // 先触发 closeEvent
+
+    // 然后再退出应用程序
+    QApplication::quit();
 }
 
 void Whiteboard::saveWhiteboardConfig(){
@@ -236,7 +263,13 @@ void Whiteboard::saveWhiteboardConfig(){
     geometry.topLeft = pos();
     geometry.size = size();
     qDebug() << "白板位置" << geometry.topLeft << "白板大小" << geometry.size ;
-    ConfigManager::saveWindowGeometry(geometry, "whiteboard_config.ini");
+    QString configPath = QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation);
+    QDir dir(configPath);
+    if (!dir.exists()){
+        dir.mkpath(".");
+    }
+    QString filePath = configPath + "/whiteboard_config.ini";
+    ConfigManager::saveWindowGeometry(geometry, filePath);
 }
 
 

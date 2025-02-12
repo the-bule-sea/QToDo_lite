@@ -3,6 +3,7 @@
 
 #include <QString>
 #include <QList>
+#include <QStandardPaths>
 
 // 结构体
 struct TaskData {
