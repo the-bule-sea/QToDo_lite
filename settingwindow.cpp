@@ -7,6 +7,7 @@
 #else
 #include <QFile>
 #include <QDir>
+#include <QTextStream>
 #endif
 
 // 应用常量名
