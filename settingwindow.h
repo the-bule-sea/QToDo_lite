@@ -18,5 +18,7 @@ public:
 
 private:
     Ui::SettingWindow *ui;
+
+    void setAutoStart(bool enable);
 };
 #endif // SETTINGWINDOW_H

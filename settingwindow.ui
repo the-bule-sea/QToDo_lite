@@ -24,14 +24,14 @@
    </property>
    <layout class="QGridLayout" name="gridLayout">
     <item row="0" column="1" alignment="Qt::AlignLeft">
-     <widget class="QCheckBox" name="autostartBox">
+     <widget class="QCheckBox" name="autoStartCheckBox">
       <property name="text">
        <string>自启动</string>
       </property>
      </widget>
     </item>
     <item row="1" column="1" alignment="Qt::AlignLeft">
-     <widget class="QCheckBox" name="updateBox">
+     <widget class="QCheckBox" name="updateCheckBox">
       <property name="text">
        <string>检查更新</string>
       </property>

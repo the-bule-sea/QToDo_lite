@@ -141,7 +141,7 @@ void Whiteboard::createTrayIcon()
     trayIcon = new QSystemTrayIcon(this);
     trayIcon->setContextMenu(trayMenu);
     trayIcon->setIcon(QIcon("://todo_ico_v2.svg"));
-    trayIcon->setToolTip("todo-lite");
+    trayIcon->setToolTip("QToDoLite");
     trayMenu->setStyleSheet("QMenu {"
                              "    background-color: #ffffff; /* Light gray background */"
                              "    border: 2px solid #c0c0c0;      /* Gray border */"
@@ -167,7 +167,7 @@ void Whiteboard::createTrayIcon()
 void Whiteboard::createNewMainWindow()
 {
     MainWindow *mainWindow = new MainWindow();
-    mainWindow->setWindowTitle("ToDo-lite");
+    mainWindow->setWindowTitle("QToDo-lite");
     mainWindow->setAttribute(Qt::WA_QuitOnClose, false); // 设置窗口属性
     mainWindow->show();
 }
