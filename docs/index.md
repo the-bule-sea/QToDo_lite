@@ -12,7 +12,7 @@ hero:
   actions:
     - theme: brand
       text: DownLoad
-      link: https://github.com/the-bule-sea/QToDo_lite
+      link: https://github.com/the-bule-sea/QToDo_lite/releases
     - theme: alt
       text: SourceCode
       link: https://github.com/the-bule-sea/QToDo_lite
