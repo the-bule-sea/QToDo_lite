@@ -5,7 +5,7 @@ export default defineConfig({
   base: '/QToDo_lite/',
   title: "QToDoLite",
   description: "QToDoLite Site",
-  head: [["link", { rel: "icon", href: "/logo.ico" }]],
+  head: [["link", { rel: "icon", href: "/QToDo_lite/logo.ico" }]],
   themeConfig: {
     logo: "/logo.svg",
     // https://vitepress.dev/reference/default-theme-config
