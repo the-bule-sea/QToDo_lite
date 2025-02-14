@@ -2,12 +2,12 @@
 #include "ui_settingwindow.h"
 #include <QCoreApplication>
 #include <QDebug>
+#include <QDir>
 
 #ifdef Q_OS_WIN32
 #include <QSettings>
 #else
 #include <QFile>
-#include <QDir>
 #include <QTextStream>
 #endif
 
@@ -41,7 +41,10 @@ SettingWindow::~SettingWindow()
 
 void SettingWindow::setAutoStart(bool enable)
 {
-    QString appPath = QCoreApplication::applicationFilePath();
+    QString appPath = QDir::toNativeSeparators(QCoreApplication::applicationFilePath());
+//    QString appPath2 = QCoreApplication::applicationFilePath();
+    qDebug() << "启动时的appPath" << appPath;
+//    qDebug() << "未处理的appPath" << appPath2;
 
 #ifdef Q_OS_WIN32
     QSettings settings("HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Run", QSettings::Registry32Format);
